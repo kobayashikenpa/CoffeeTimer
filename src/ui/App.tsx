@@ -11,6 +11,7 @@ import { emptyDraft } from './edit/form'
 import { useRecipes } from './hooks'
 import { TimerScreen } from './timer/TimerScreen'
 import { RecipeList } from './recipes/RecipeList'
+import { SettingsScreen } from './settings/SettingsScreen'
 import { TabBar } from './tabs/TabBar'
 import type { Tab } from './tabs/TabBar'
 
@@ -118,7 +119,7 @@ export default function App() {
             <p className="muted">淹れた記録の機能は、今後の版で使えるようになります。</p>
           </>
         )}
-        {tab === 'settings' && <h1 className="page-title">設定</h1>}
+        {tab === 'settings' && <SettingsScreen onSaveResult={persisted} />}
       </main>
       {!hideTabs && <TabBar current={tab} onChange={setTab} />}
     </div>
