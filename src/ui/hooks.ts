@@ -12,12 +12,6 @@ export function useRecipes(): readonly Recipe[] {
   return useSyncExternalStore(store.subscribe, store.list)
 }
 
-/** 1件のレシピ（無ければ undefined） */
-export function useRecipe(id: string): Recipe | undefined {
-  const list = useRecipes()
-  return list.find((r) => r.id === id)
-}
-
 /** 設定（音・読み上げの初期値） */
 export function useSettings(): Settings {
   const store = settingsStore()

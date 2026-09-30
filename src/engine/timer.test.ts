@@ -32,7 +32,7 @@ const T0 = 1_700_000_000_000
 describe('準備（ready）', () => {
   it('最初は準備で、経過 0・今の手順なし・次は最初の手順', () => {
     const s = initial()
-    expect(s).toEqual({ phase: 'ready', startAtMs: 0 })
+    expect(s).toEqual({ phase: 'ready' })
     expect(view(s, recipe, T0)).toEqual({
       elapsedSec: 0,
       progress: 0,

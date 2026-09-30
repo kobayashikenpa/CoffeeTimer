@@ -206,7 +206,7 @@ export interface Settings {
 
 /** タイマーの状態（仕様 8.3：準備 → 抽出中 ⇄ 一時停止 → 完成） */
 export type TimerState =
-  | { phase: 'ready'; startAtMs: number }                 // 準備。手順へ飛んだときの開始位置（ふつう 0）
+  | { phase: 'ready' }                                    // 準備（START で 0 秒から始まる）
   | { phase: 'running'; anchorMs: number }                // 抽出中。経過 = now − anchorMs
   | { phase: 'paused'; elapsedMs: number }                // 一時停止。止めた時点の経過
   | { phase: 'done' };                                    // 完成
@@ -367,8 +367,8 @@ engine/scale.scaleRecipe(recipe, newBeansG) → ScaledRecipe
 
 ```
 engine/timer（すべて nowMs を受け取る純粋な関数）
-  initial()                          → { phase:'ready', startAtMs:0 }
-  start(state, nowMs)                → ready  → running（anchorMs = nowMs − startAtMs）
+  initial()                          → { phase:'ready' }
+  start(state, nowMs)                → ready  → running（anchorMs = nowMs）
   pause(state, nowMs)                → running→ paused（elapsedMs = nowMs − anchorMs）
   resume(state, nowMs)               → paused → running（anchorMs = nowMs − elapsedMs）
   reset()                            → ready（確認なし）

@@ -5,8 +5,8 @@ import type { Recipe } from './types'
 
 /** タイマーの状態（準備 → 抽出中 ⇄ 一時停止 → 完成） */
 export type TimerState =
-  /** 準備。startAtMs は START したときの開始位置（ふつう 0） */
-  | { phase: 'ready'; startAtMs: number }
+  /** 準備（START で 0 秒から始まる） */
+  | { phase: 'ready' }
   /** 抽出中。経過 = nowMs − anchorMs */
   | { phase: 'running'; anchorMs: number }
   /** 一時停止。止めた時点の経過 */
@@ -33,13 +33,13 @@ type TimerRecipe = Pick<Recipe, 'steps' | 'totalSec'>
 
 /** 最初の状態（準備） */
 export function initial(): TimerState {
-  return { phase: 'ready', startAtMs: 0 }
+  return { phase: 'ready' }
 }
 
 /** START：準備 → 抽出中。ほかの状態では何もしない */
 export function start(state: TimerState, nowMs: number): TimerState {
   if (state.phase !== 'ready') return state
-  return { phase: 'running', anchorMs: nowMs - state.startAtMs }
+  return { phase: 'running', anchorMs: nowMs }
 }
 
 /** 一時停止：抽出中 → 一時停止。ほかの状態では何もしない */
@@ -83,7 +83,7 @@ export function elapsedMs(state: TimerState, recipe: TimerRecipe, nowMs: number)
   let raw: number
   switch (state.phase) {
     case 'ready':
-      raw = state.startAtMs
+      raw = 0
       break
     case 'running':
       raw = nowMs - state.anchorMs
