@@ -13,6 +13,7 @@ import { openableUrl } from '../../engine/url'
 import { Switch } from '../common/Switch'
 import { prepareSound, playSound } from '../device/sound'
 import { prepareSpeech, speak, stopSpeech } from '../device/speech'
+import { useWakeLock } from '../device/wakeLock'
 import { useSettings } from '../hooks'
 import { Ring } from './Ring'
 import './timer.css'
@@ -127,6 +128,9 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
     const t = nowMs()
     advance(seek(cur, scaled, index, t), t)
   }
+  // 抽出中・一時停止中は画面を暗くしない。画面を離れたら（この部品が消えたら）放す
+  const wakeLock = useWakeLock(state.phase === 'running' || state.phase === 'paused')
+
   const pours = useMemo(() => pourAmounts(scaled.steps), [scaled])
   const v = view(state, scaled, now)
   const canChangeBeans = state.phase === 'ready'
@@ -372,6 +376,12 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
           })}
         </ol>
       </section>
+
+      {wakeLock.unavailable && (
+        <p className="small muted" style={{ margin: 0 }}>
+          この端末では、画面を暗くしない機能が使えません。抽出中に画面が暗くなったら、画面に触れてください。
+        </p>
+      )}
 
       <div className="controls">
         <button type="button" className="btn btn-primary" disabled={state.phase === 'done'} onClick={onPrimary}>
