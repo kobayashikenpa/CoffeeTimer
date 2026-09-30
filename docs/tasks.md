@@ -38,7 +38,7 @@
   - `npm run dev` で開いた画面に「CoffeeTimer」と出る
   - `dist/index.html` の中の読み込み先が `/CoffeeTimer/` で始まる
 
-### [ ] B-02 GitHub Pages への自動公開
+### [x] B-02 GitHub Pages への自動公開
 - 担当：engine-dev
 - 依存：B-01
 - 仕様書：1、CLAUDE.md「技術」
