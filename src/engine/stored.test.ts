@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseStoredRecipes, parseStoredSettings, toStoredRecipe } from './stored'
+import { parseStoredRecipes, parseStoredRecords, parseStoredSettings, toStoredRecipe, toStoredRecord } from './stored'
 import type { Recipe } from './types'
 
 const recipe: Recipe = {
@@ -62,5 +62,47 @@ describe('parseStoredSettings', () => {
     expect(parseStoredSettings({ soundOn: 'yes', speechOn: true })).toBeNull()
     expect(parseStoredSettings(null)).toBeNull()
     expect(parseStoredSettings({})).toBeNull()
+  })
+})
+
+describe('parseStoredRecords（淹れた記録）', () => {
+  const record = {
+    id: 'x1',
+    brewedAt: '2026-09-30T08:15:00.000Z',
+    recipeId: 'r1',
+    recipeName: '基本のハンドドリップ',
+    beansG: 20,
+    waterG: 333,
+    beanName: 'エチオピア',
+    rating: 4,
+    memo: '',
+    updatedAt: '2026-09-30T08:20:00.000Z',
+  }
+  it('正しい形なら読める（評価は空でもよい）', () => {
+    expect(parseStoredRecords({ version: 1, items: [record, { ...record, id: 'x2', rating: null }] })).toEqual([
+      record,
+      { ...record, id: 'x2', rating: null },
+    ])
+    expect(toStoredRecord(record)).toEqual(record)
+  })
+  it('評価が 0・6・文字、日時が壊れている、ID が空、豆の量が文字 → 形が違う', () => {
+    for (const bad of [
+      { ...record, rating: 0 },
+      { ...record, rating: 6 },
+      { ...record, rating: '4' },
+      { ...record, brewedAt: 'きのう' },
+      { ...record, id: '' },
+      { ...record, beansG: '20' },
+      { ...record, memo: undefined },
+    ]) {
+      expect(toStoredRecord(bad)).toBeNull()
+      expect(parseStoredRecords({ version: 1, items: [record, bad] })).toBeNull()
+    }
+  })
+  it('一覧の形が違えば null', () => {
+    expect(parseStoredRecords(null)).toBeNull()
+    expect(parseStoredRecords({ version: 2, items: [] })).toBeNull()
+    expect(parseStoredRecords({ version: 1 })).toBeNull()
+    expect(parseStoredRecords({ version: 1, items: [] })).toEqual([])
   })
 })

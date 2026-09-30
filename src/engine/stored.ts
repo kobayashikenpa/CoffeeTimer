@@ -1,7 +1,8 @@
 // 端末に保存した中身（localStorage から読んだ JSON）の形を確かめる（architecture.md 3.3）
 // 形が違えば null を返す。呼ぶ側（store）は、そのとき元の文字列を退避してから空で始める
+import { isRating, isValidDateTime } from './record'
 import { GRINDS } from './types'
-import type { Grind, Recipe, Settings, Step } from './types'
+import type { BrewRecord, Grind, Recipe, Settings, Step } from './types'
 
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -90,4 +91,30 @@ export function parseStoredRecipes(v: unknown): Recipe[] | null {
 export function parseStoredSettings(v: unknown): Settings | null {
   if (!isObject(v) || !isBool(v.soundOn) || !isBool(v.speechOn)) return null
   return { soundOn: v.soundOn, speechOn: v.speechOn }
+}
+
+/** 保存した淹れた記録1件の形を確かめる。形が違えば null */
+export function toStoredRecord(v: unknown): BrewRecord | null {
+  if (!isObject(v)) return null
+  const { id, brewedAt, recipeId, recipeName, beansG, waterG, beanName, rating, memo, updatedAt } = v
+  if (!isString(id) || id === '' || !isString(recipeId) || !isString(recipeName)) return null
+  if (!isString(brewedAt) || !isValidDateTime(brewedAt) || !isString(updatedAt)) return null
+  if (!isNumber(beansG) || !isNumber(waterG)) return null
+  if (!isString(beanName) || !isString(memo) || !isRating(rating)) return null
+  return { id, brewedAt, recipeId, recipeName, beansG, waterG, beanName, rating, memo, updatedAt }
+}
+
+/**
+ * 保存した記録の一覧（`{ version: 1, items: BrewRecord[] }`）の形を確かめる。
+ * 1件でも形が違えば、全体を壊れているとして null
+ */
+export function parseStoredRecords(v: unknown): BrewRecord[] | null {
+  if (!isObject(v) || v.version !== 1 || !Array.isArray(v.items)) return null
+  const items: BrewRecord[] = []
+  for (const item of v.items) {
+    const r = toStoredRecord(item)
+    if (!r) return null
+    items.push(r)
+  }
+  return items
 }
