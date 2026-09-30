@@ -31,13 +31,14 @@ function snapshot(form: RecipeForm): string {
 export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRecipeProps) {
   const [form, setForm] = useState<RecipeForm>(() => draftToForm(initial))
   const [initialSnapshot] = useState(() => snapshot(form))
-  const [attempted, setAttempted] = useState(false)
+  // AI で読み取った直後は、空の必須項目などをはじめからその項目のそばに出す（仕様 6.3・7）
+  const [attempted, setAttempted] = useState(fromAi)
   const [confirmCancel, setConfirmCancel] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
   const { draft, formatErrors } = useMemo(() => formToDraft(form), [form])
   const result = useMemo(() => validateRecipe(draft), [draft])
-  // エラーは「保存」を一度押してから出す（入れ始めから赤い字だらけにしない）。注意はいつも出す
+  // 手で入れるときのエラーは「保存」を一度押してから出す（入れ始めから赤い字だらけにしない）。注意はいつも出す
   const errors = attempted ? mergeIssues(formatErrors, result.errors) : []
   const warnings = result.warnings
   const errorOf = (field: string) => errors.find((e) => e.field === field)?.message
