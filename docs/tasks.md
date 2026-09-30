@@ -312,7 +312,7 @@
   - `buildRequest(input)`：URL のとき `file_data.file_uri` と指示文、文章のとき指示文＋文章の本文を作る
 - 完了の条件：URL のときの本文に `file_data.file_uri` と `generationConfig.responseMimeType: 'application/json'`・`responseSchema` が入り、文章のときは `file_data` が無いテストが通る
 
-### [ ] A-02 Gemini の呼び出しとエラーの振り分け
+### [x] A-02 Gemini の呼び出しとエラーの振り分け
 - 担当：engine-dev
 - 依存：A-01
 - 仕様書：6.2、6.3、6.4

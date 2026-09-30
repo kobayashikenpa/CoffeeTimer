@@ -298,7 +298,9 @@ ai/gemini.readRecipe({ input, apiKey, fetch, signal })
  │  400 で API_KEY_INVALID／401／403   → invalidKey 「APIキーが正しくないようです…」
  │  429                               → quota      「AI の利用回数の上限に達しました…」
  │  400 などで動画に関するエラー         → video      「この動画は読み取れませんでした…」＋貼り付けへ
+ │  文章のときの 400・500／503 などそのほか → broken   「読み取りに失敗しました…」（暫定）
  │  JSON として読めない                  → broken     「読み取りに失敗しました…」
+ │  3分を過ぎた（暫定）                  → timeout    「読み取りに失敗しました…」と同じ文（暫定）
  │  中止                               → cancelled  （何も出さず追加画面に戻る）
  ↓
 engine/aiResult.normalizeAiResult(unknownJson)
