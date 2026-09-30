@@ -288,7 +288,7 @@
   - `youtube.com/watch?v=…`、`youtu.be/…`、`youtube.com/shorts/…`、`m.youtube.com/watch?v=…`（http／https、`www.` の有無、余分なパラメータ・前後の空白つき）を受け付けるテストが通る
   - YouTube 以外の URL、ID の無い URL、ただの文字を null にするテストが通る
 
-### [ ] E-08 AI の返答の検証と変換
+### [x] E-08 AI の返答の検証と変換
 - 担当：engine-dev
 - 依存：E-03
 - 仕様書：6.2、6.3
