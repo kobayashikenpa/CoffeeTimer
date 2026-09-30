@@ -22,8 +22,25 @@ function toStep(v: unknown): Step | null {
 /** 保存したレシピ1件の形を確かめる。形が違えば null */
 export function toStoredRecipe(v: unknown): Recipe | null {
   if (!isObject(v)) return null
-  const { id, name, author, videoUrl, equipment, beansG, waterG, tempC, grind, description, totalSec, steps, favorite, createdAt, updatedAt } = v
-  if (!isString(id) || id === '' || !isString(name) || !isString(author) || !isString(videoUrl) || !isString(equipment)) return null
+  const {
+    id,
+    name,
+    author,
+    videoUrl,
+    equipment,
+    beansG,
+    waterG,
+    tempC,
+    grind,
+    description,
+    totalSec,
+    steps,
+    favorite,
+    createdAt,
+    updatedAt,
+  } = v
+  if (!isString(id) || id === '' || !isString(name) || !isString(author) || !isString(videoUrl) || !isString(equipment))
+    return null
   if (!isNumber(beansG) || beansG <= 0 || !isNumber(waterG) || waterG <= 0 || !isNumber(totalSec)) return null
   if (!(tempC === null || isNumber(tempC))) return null
   if (!(grind === null || (isString(grind) && (GRINDS as readonly string[]).includes(grind)))) return null

@@ -76,7 +76,11 @@ describe('レシピの保存', () => {
     store.save(makeRecipe('b'))
     store.remove('a')
     expect(store.list().map((r) => r.id)).toEqual(['b'])
-    expect(createRecipeStore(memoryStorage(storage.data)).list().map((r) => r.id)).toEqual(['b'])
+    expect(
+      createRecipeStore(memoryStorage(storage.data))
+        .list()
+        .map((r) => r.id),
+    ).toEqual(['b'])
     expect(storage.getItem('coffeetimer.records.v1')).toBe('{"version":1,"items":[]}')
   })
 

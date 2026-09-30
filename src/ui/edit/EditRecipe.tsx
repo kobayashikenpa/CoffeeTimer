@@ -82,7 +82,11 @@ export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRe
   const ratioText = ratio(draft.beansG, draft.waterG)
   const isNew = initial.id === null
 
-  const input = (field: string, key: 'name' | 'author' | 'videoUrl' | 'equipment' | 'beans' | 'water' | 'temp' | 'total', extra: InputHTMLAttributes<HTMLInputElement> = {}) => (
+  const input = (
+    field: string,
+    key: 'name' | 'author' | 'videoUrl' | 'equipment' | 'beans' | 'water' | 'temp' | 'total',
+    extra: InputHTMLAttributes<HTMLInputElement> = {},
+  ) => (
     <input
       id={`f-${field}`}
       className="input"
@@ -165,7 +169,13 @@ export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRe
             </select>
           </Field>
         </div>
-        <Field id="f-totalSec" label="完成時刻" required error={errorOf('totalSec')} hint="抽出が終わる時刻。「分:秒」（例 3:00）か秒（例 180）で入れます">
+        <Field
+          id="f-totalSec"
+          label="完成時刻"
+          required
+          error={errorOf('totalSec')}
+          hint="抽出が終わる時刻。「分:秒」（例 3:00）か秒（例 180）で入れます"
+        >
           {input('totalSec', 'total', { placeholder: '3:00', autoComplete: 'off' })}
         </Field>
         <Field id="f-equipment" label="器具">
@@ -175,7 +185,12 @@ export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRe
           {input('author', 'author', { placeholder: '例 動画のチャンネル名' })}
         </Field>
         <Field id="f-videoUrl" label="動画の URL">
-          {input('videoUrl', 'videoUrl', { type: 'url', inputMode: 'url', placeholder: 'https://www.youtube.com/watch?v=…', autoComplete: 'off' })}
+          {input('videoUrl', 'videoUrl', {
+            type: 'url',
+            inputMode: 'url',
+            placeholder: 'https://www.youtube.com/watch?v=…',
+            autoComplete: 'off',
+          })}
         </Field>
         <Field id="f-description" label="説明">
           <textarea

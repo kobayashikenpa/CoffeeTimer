@@ -34,7 +34,8 @@ export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, o
         <div className="card empty">
           <p>まだレシピがありません。</p>
           <p className="muted">
-            上の「＋ レシピを追加」を押して、最初のレシピを作りましょう。豆の量・湯量と、蒸らし・1投目などの手順を入れると、タイマーで淹れられます。
+            上の「＋
+            レシピを追加」を押して、最初のレシピを作りましょう。豆の量・湯量と、蒸らし・1投目などの手順を入れると、タイマーで淹れられます。
           </p>
           <button type="button" className="btn btn-primary btn-block" onClick={onAdd}>
             ＋ レシピを追加
@@ -80,7 +81,13 @@ export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, o
 
       {menuFor && (
         <div className="overlay" onClick={() => setMenuFor(null)}>
-          <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="menu-title" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="menu-title"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p id="menu-title" className="dialog-title">
               {menuFor.name}
             </p>

@@ -11,7 +11,15 @@ export interface ConfirmDialogProps {
   onCancel: () => void
 }
 
-export function ConfirmDialog({ title, message, confirmLabel, cancelLabel = 'キャンセル', danger, onConfirm, onCancel }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  title,
+  message,
+  confirmLabel,
+  cancelLabel = 'キャンセル',
+  danger,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null)
   const onCancelRef = useRef(onCancel)
   useEffect(() => {
@@ -40,7 +48,11 @@ export function ConfirmDialog({ title, message, confirmLabel, cancelLabel = 'キ
         </p>
         {message && <p style={{ margin: 0 }}>{message}</p>}
         <div className="dialog-actions">
-          <button type="button" className={`btn btn-block ${danger ? 'btn-danger' : 'btn-primary'}`} onClick={onConfirm}>
+          <button
+            type="button"
+            className={`btn btn-block ${danger ? 'btn-danger' : 'btn-primary'}`}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </button>
           <button type="button" ref={cancelRef} className="btn btn-block" onClick={onCancel}>

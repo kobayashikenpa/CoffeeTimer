@@ -9,6 +9,7 @@ import type { RecipeDraft } from '../engine/types'
 import { EditRecipe } from './edit/EditRecipe'
 import { emptyDraft } from './edit/form'
 import { useRecipes } from './hooks'
+import { TimerScreen } from './timer/TimerScreen'
 import { RecipeList } from './recipes/RecipeList'
 import { TabBar } from './tabs/TabBar'
 import type { Tab } from './tabs/TabBar'
@@ -17,6 +18,7 @@ import type { Tab } from './tabs/TabBar'
 type RecipeScreen =
   | { kind: 'list' }
   | { kind: 'edit'; draft: RecipeDraft; fromAi: boolean; back: RecipeScreen }
+  | { kind: 'timer'; recipeId: string }
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('recipes')
@@ -30,8 +32,9 @@ export default function App() {
   )
   const [saveFailed, setSaveFailed] = useState(false)
   const recipes = useRecipes()
-  // タイマー画面の間は下のタブを隠す（U-05 でつなぐ）
-  const hideTabs = false
+  const timerRecipe = screen.kind === 'timer' ? recipes.find((r) => r.id === screen.recipeId) : undefined
+  // タイマー画面の間は下のタブを隠して画面を広く使う
+  const hideTabs = tab === 'recipes' && timerRecipe !== undefined
 
   /** 端末に書けなかったときは案内を出す（画面の中では続けて使える） */
   const persisted = (ok: boolean) => {
@@ -46,7 +49,12 @@ export default function App() {
             <p>
               保存していたデータが読めなかったため、空の状態で始めました。読めなかったデータは、この端末の中に別にして残してあります。
             </p>
-            <button type="button" className="btn btn-ghost" aria-label="この案内を閉じる" onClick={() => setBrokenNotice(false)}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              aria-label="この案内を閉じる"
+              onClick={() => setBrokenNotice(false)}
+            >
               ✕
             </button>
           </div>
@@ -56,7 +64,12 @@ export default function App() {
             <p>
               この端末に保存できませんでした。ブラウザのプライベートモードや設定で、保存が止められている可能性があります。ページを閉じると、変更は消えます。
             </p>
-            <button type="button" className="btn btn-ghost" aria-label="この案内を閉じる" onClick={() => setSaveFailed(false)}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              aria-label="この案内を閉じる"
+              onClick={() => setSaveFailed(false)}
+            >
               ✕
             </button>
           </div>
@@ -78,11 +91,19 @@ export default function App() {
             onCancel={() => setScreen(screen.back)}
           />
         )}
-        {tab === 'recipes' && screen.kind === 'list' && (
+        {tab === 'recipes' && timerRecipe && (
+          <TimerScreen
+            key={timerRecipe.id + timerRecipe.updatedAt}
+            recipe={timerRecipe}
+            onBack={() => setScreen({ kind: 'list' })}
+            onEdit={() => setScreen({ kind: 'edit', draft: recipeToDraft(timerRecipe), fromAi: false, back: screen })}
+          />
+        )}
+        {tab === 'recipes' && (screen.kind === 'list' || (screen.kind === 'timer' && !timerRecipe)) && (
           <RecipeList
             recipes={recipes}
             onAdd={() => setScreen({ kind: 'edit', draft: emptyDraft(), fromAi: false, back: screen })}
-            onOpen={() => {}}
+            onOpen={(id) => setScreen({ kind: 'timer', recipeId: id })}
             onEdit={(id) => {
               const r = recipeStore().get(id)
               if (r) setScreen({ kind: 'edit', draft: recipeToDraft(r), fromAi: false, back: screen })

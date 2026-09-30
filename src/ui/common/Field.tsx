@@ -19,7 +19,11 @@ export function Field({ id, label, required, error, warn, hint, children }: Fiel
         {required && <span className="field-required">必須</span>}
       </label>
       {children}
-      {hint && !error && <p className="muted small" style={{ margin: 0 }} id={`${id}-hint`}>{hint}</p>}
+      {hint && !error && (
+        <p className="muted small" style={{ margin: 0 }} id={`${id}-hint`}>
+          {hint}
+        </p>
+      )}
       {error && (
         <p className="field-error" id={`${id}-error`}>
           {error}
