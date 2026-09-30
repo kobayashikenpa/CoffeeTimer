@@ -8,7 +8,9 @@ import type { Recipe, Step } from './types'
 export function ratio(beansG: number | null, waterG: number | null): string | null {
   if (beansG === null || waterG === null) return null
   if (!(beansG > 0) || !(waterG > 0)) return null
-  return `1:${(waterG / beansG).toFixed(1)}`
+  // toFixed は 16.65 を 16.6 にしてしまうため、10倍して整数で四捨五入する
+  const tenths = Math.round(Number(((waterG / beansG) * 10).toPrecision(12)))
+  return `1:${(tenths / 10).toFixed(1)}`
 }
 
 /**
