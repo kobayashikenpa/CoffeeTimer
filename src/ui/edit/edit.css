@@ -14,7 +14,10 @@
   color: var(--accent-strong);
 }
 
+/* 開始の時刻を入れて欄を離れると手順が並べ替わる。そのときブラウザが手順のカードを基準に
+   画面を動かす（スクロールの固定）と、ページが大きく跳んで次のタップが外れるため、基準にさせない */
 .step-forms {
+  overflow-anchor: none;
   list-style: none;
   margin: 0;
   padding: 0;
