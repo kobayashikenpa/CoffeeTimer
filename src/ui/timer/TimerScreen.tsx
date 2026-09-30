@@ -10,6 +10,10 @@ import { initial, pause, reset, resume, seek, start, tick, view } from '../../en
 import type { TimerState } from '../../engine/timer'
 import type { Recipe } from '../../engine/types'
 import { openableUrl } from '../../engine/url'
+import { Switch } from '../common/Switch'
+import { prepareSound, playSound } from '../device/sound'
+import { prepareSpeech, speak, stopSpeech } from '../device/speech'
+import { useSettings } from '../hooks'
 import { Ring } from './Ring'
 import './timer.css'
 
@@ -40,8 +44,31 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
   // 豆の量を変えたときは、湯量・目標量を計算し直したレシピを使う（時間は変わらない）
   const scaled = useMemo(() => scaleRecipe(recipe, beans), [recipe, beans])
 
-  /** 手順の切り替わりの合図（音・読み上げは U-07 でつなぐ） */
-  const onCue = useCallback((_cue: Cue) => {}, [])
+  // 音・読み上げの ON／OFF：初期値は設定から。ここでの切り替えはこの画面の中だけ（設定は変えない）
+  const settings = useSettings()
+  const [soundOn, setSoundOn] = useState(settings.soundOn)
+  const [speechOn, setSpeechOn] = useState(settings.speechOn)
+  const soundOnRef = useRef(soundOn)
+  const speechOnRef = useRef(speechOn)
+  useEffect(() => {
+    soundOnRef.current = soundOn
+    speechOnRef.current = speechOn
+    if (!speechOn) stopSpeech()
+  }, [soundOn, speechOn])
+  // 画面を離れたら読み上げを止める
+  useEffect(() => stopSpeech, [])
+
+  /** 手順の切り替わりの合図：音と読み上げ（1回だけ） */
+  const onCue = useCallback((cue: Cue) => {
+    if (soundOnRef.current) playSound(cue.kind)
+    if (speechOnRef.current) speak(cue.speech)
+  }, [])
+
+  /** iPhone で鳴るよう、ボタンを押した操作の中で音と読み上げを準備する */
+  const prepareDevices = () => {
+    if (soundOnRef.current) prepareSound()
+    if (speechOnRef.current) prepareSpeech()
+  }
 
   /**
    * 状態を進めて表示し直す。表示はいつも「今の時刻」から engine/timer で計算する（1秒ずつ足さない）。
@@ -83,6 +110,7 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
   }, [advance])
 
   const onPrimary = () => {
+    prepareDevices()
     const t = nowMs()
     const cur = stateRef.current
     if (cur.phase === 'ready') advance(start(cur, t), t)
@@ -94,6 +122,7 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
     advance(reset(), nowMs())
   }
   const onSeek = (index: number) => {
+    prepareDevices()
     const cur = stateRef.current
     const t = nowMs()
     advance(seek(cur, scaled, index, t), t)
@@ -234,6 +263,25 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
           </dl>
         </section>
       )}
+
+      <div className="toggles">
+        <Switch
+          label="音"
+          checked={soundOn}
+          onChange={(on) => {
+            setSoundOn(on)
+            if (on) prepareSound()
+          }}
+        />
+        <Switch
+          label="読み上げ"
+          checked={speechOn}
+          onChange={(on) => {
+            setSpeechOn(on)
+            if (on) prepareSpeech()
+          }}
+        />
+      </div>
 
       <Ring
         progress={v.progress}
