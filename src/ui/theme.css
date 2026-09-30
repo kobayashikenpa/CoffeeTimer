@@ -434,6 +434,10 @@ textarea.input {
   gap: 8px;
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

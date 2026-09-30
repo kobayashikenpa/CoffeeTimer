@@ -3,17 +3,25 @@
 import { useState } from 'react'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
+import { useRecipes } from './hooks'
+import { RecipeList } from './recipes/RecipeList'
 import { TabBar } from './tabs/TabBar'
 import type { Tab } from './tabs/TabBar'
-import './theme.css'
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('recipes')
   const [brokenNotice, setBrokenNotice] = useState(
     () => recipeStore().recoveredFromBroken || settingsStore().recoveredFromBroken,
   )
+  const [saveFailed, setSaveFailed] = useState(false)
+  const recipes = useRecipes()
   // タイマー画面の間は下のタブを隠す（U-05 でつなぐ）
   const hideTabs = false
+
+  /** 端末に書けなかったときは案内を出す（画面の中では続けて使える） */
+  const persisted = (ok: boolean) => {
+    if (!ok) setSaveFailed(true)
+  }
 
   return (
     <div className="app">
@@ -28,7 +36,26 @@ export default function App() {
             </button>
           </div>
         )}
-        {tab === 'recipes' && <h1 className="page-title">レシピ</h1>}
+        {saveFailed && (
+          <div className="notice notice-danger notice-row" role="alert" style={{ marginBottom: 16 }}>
+            <p>
+              この端末に保存できませんでした。ブラウザのプライベートモードや設定で、保存が止められている可能性があります。ページを閉じると、変更は消えます。
+            </p>
+            <button type="button" className="btn btn-ghost" aria-label="この案内を閉じる" onClick={() => setSaveFailed(false)}>
+              ✕
+            </button>
+          </div>
+        )}
+        {tab === 'recipes' && (
+          <RecipeList
+            recipes={recipes}
+            onAdd={() => {}}
+            onOpen={() => {}}
+            onEdit={() => {}}
+            onToggleFavorite={(id) => persisted(recipeStore().toggleFavorite(id))}
+            onDelete={(id) => persisted(recipeStore().remove(id))}
+          />
+        )}
         {tab === 'records' && (
           <>
             <h1 className="page-title">記録</h1>
