@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
 import { recipeToDraft, toRecipe } from '../engine/validate'
-import { toRecord } from '../engine/record'
+import { recordToDraft, toRecord } from '../engine/record'
 import { recordStore } from '../store/records'
 import { newId } from '../store/ids'
 import type { RecipeDraft } from '../engine/types'
@@ -16,6 +16,8 @@ import { emptyDraft } from './edit/form'
 import { useRecipes, useRecords } from './hooks'
 import { TimerScreen } from './timer/TimerScreen'
 import { RecipeList } from './recipes/RecipeList'
+import { RecordEditor } from './records/RecordEditor'
+import { RecordsScreen } from './records/RecordsScreen'
 import { SettingsScreen } from './settings/SettingsScreen'
 import { TabBar } from './tabs/TabBar'
 import type { Tab } from './tabs/TabBar'
@@ -41,6 +43,16 @@ export default function App() {
   const [saveFailed, setSaveFailed] = useState(false)
   const recipes = useRecipes()
   const records = useRecords()
+  // 記録タブ：直している記録の ID（null は一覧）・絞り込み・知らせ
+  const [editingRecordId, setEditingRecordId] = useState<string | null>(null)
+  const [recordFilter, setRecordFilter] = useState<string | null>(null)
+  const [recordNotice, setRecordNotice] = useState<string | null>(null)
+  const editingRecord = editingRecordId === null ? undefined : records.find((r) => r.id === editingRecordId)
+  const changeTab = (next: Tab) => {
+    setTab(next)
+    setRecordNotice(null)
+    if (next === 'records') setEditingRecordId(null)
+  }
   const timerRecipe = screen.kind === 'timer' ? recipes.find((r) => r.id === screen.recipeId) : undefined
   // タイマー画面の間は下のタブを隠して画面を広く使う
   const hideTabs = tab === 'recipes' && timerRecipe !== undefined
@@ -124,7 +136,8 @@ export default function App() {
               persisted(recordStore().save(record))
               // 保存したら記録タブで見せる（レシピタブは一覧に戻す）
               setScreenState({ kind: 'list' })
-              setTab('records')
+              changeTab('records')
+              setRecordNotice('淹れた記録を保存しました')
               window.scrollTo(0, 0)
             }}
           />
@@ -142,15 +155,46 @@ export default function App() {
             onDelete={(id) => persisted(recipeStore().remove(id))}
           />
         )}
-        {tab === 'records' && (
-          <>
-            <h1 className="page-title">記録</h1>
-            <p className="muted">淹れた記録：{records.length} 件</p>
-          </>
+        {tab === 'records' && editingRecord && (
+          <RecordEditor
+            key={editingRecord.id}
+            initial={recordToDraft(editingRecord)}
+            onSave={(draft) => {
+              persisted(recordStore().save(toRecord(draft, { id: editingRecord.id, nowIso: new Date().toISOString() })))
+              setEditingRecordId(null)
+              setRecordNotice('記録を保存しました')
+              window.scrollTo(0, 0)
+            }}
+            onCancel={() => {
+              setEditingRecordId(null)
+              window.scrollTo(0, 0)
+            }}
+            onDelete={() => {
+              persisted(recordStore().remove(editingRecord.id))
+              setEditingRecordId(null)
+              setRecordNotice('記録を削除しました')
+              window.scrollTo(0, 0)
+            }}
+          />
+        )}
+        {tab === 'records' && !editingRecord && (
+          <RecordsScreen
+            records={records}
+            recipes={recipes}
+            filter={recordFilter}
+            onFilterChange={setRecordFilter}
+            onOpen={(id) => {
+              setEditingRecordId(id)
+              setRecordNotice(null)
+              window.scrollTo(0, 0)
+            }}
+            notice={recordNotice}
+            onCloseNotice={() => setRecordNotice(null)}
+          />
         )}
         {tab === 'settings' && <SettingsScreen onSaveResult={persisted} />}
       </main>
-      {!hideTabs && <TabBar current={tab} onChange={setTab} />}
+      {!hideTabs && <TabBar current={tab} onChange={changeTab} />}
     </div>
   )
 }
