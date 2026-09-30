@@ -20,6 +20,8 @@ export interface RecipeStore {
   toggleFavorite(id: string): boolean
   /** 削除（淹れた記録は消さない）。端末に書けたら true */
   remove(id: string): boolean
+  /** 全体を置き換える（バックアップの読み込み・その取り消し用）。updatedAt は変えない。端末に書けたら true */
+  replaceAll(recipes: readonly Recipe[]): boolean
   /** 読み込んだとき中身が壊れていて、退避して空で始めたか */
   readonly recoveredFromBroken: boolean
 }
@@ -54,6 +56,9 @@ export function createRecipeStore(storage: KeyValueStore | null, now: () => Date
     remove(id) {
       if (!items.some((r) => r.id === id)) return true
       return commit(items.filter((r) => r.id !== id))
+    },
+    replaceAll(recipes) {
+      return commit([...recipes])
     },
     recoveredFromBroken: loaded.broken,
   }

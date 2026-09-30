@@ -13,6 +13,8 @@ export interface SettingsStore {
   get(): Settings
   /** 一部を変えて保存する。端末に書けたら true */
   update(patch: Partial<Settings>): boolean
+  /** 全体を置き換える（バックアップの読み込み・その取り消し用）。端末に書けたら true */
+  replace(settings: Settings): boolean
   /** 読み込んだとき中身が壊れていて、退避して初期値で始めたか */
   readonly recoveredFromBroken: boolean
 }
@@ -26,6 +28,12 @@ export function createSettingsStore(storage: KeyValueStore | null): SettingsStor
     get: () => current,
     update(patch) {
       current = { ...current, ...patch }
+      const ok = saveJson(storage, SETTINGS_KEY, current)
+      emitter.emit()
+      return ok
+    },
+    replace(settings) {
+      current = { soundOn: settings.soundOn, speechOn: settings.speechOn }
       const ok = saveJson(storage, SETTINGS_KEY, current)
       emitter.emit()
       return ok
