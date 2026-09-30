@@ -8,15 +8,16 @@ export interface KeyValueStore {
   removeItem(key: string): void
 }
 
-/** ブラウザの localStorage。使えない（プライベートブラウズ・設定で禁止など）ときは null */
+/**
+ * ブラウザの localStorage。使えない（設定で禁止など）ときは null。
+ * 使えるかは「読めるか」で決める。書き込みで試すと、いっぱいのときに使えない扱いになり、
+ * 保存してあるデータまで 0 件に見えてしまうため（書けないことは saveJson の false で分かる）
+ */
 export function getBrowserStorage(): KeyValueStore | null {
   try {
     const s = globalThis.localStorage
     if (!s) return null
-    // 使えるかを試す（Safari の一部の状態では書き込みで例外になる）
-    const probe = 'coffeetimer.probe'
-    s.setItem(probe, '1')
-    s.removeItem(probe)
+    s.getItem('coffeetimer.probe')
     return s
   } catch {
     return null
