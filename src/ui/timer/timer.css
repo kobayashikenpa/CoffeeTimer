@@ -1,0 +1,326 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.timer-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.timer-links {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-links > * {
+  flex: 1;
+}
+
+/* 豆の量 */
+.beans {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.beans-label {
+  font-weight: 700;
+  margin-right: auto;
+}
+
+.beans-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.beans-control .btn {
+  width: 48px;
+  font-size: 1.4rem;
+  padding: 0;
+}
+
+.beans-input {
+  width: 80px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.info-grid > div {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+
+.info-grid dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.info-grid dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.info-grid .changed {
+  color: var(--accent-strong);
+}
+
+/* 輪 */
+.ring {
+  position: relative;
+  width: min(68vw, 250px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--surface-2);
+  stroke-width: 12;
+}
+
+.ring-bar {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.ring-mark {
+  stroke: var(--muted);
+  stroke-width: 3;
+}
+
+.ring-mark.passed {
+  stroke: var(--text);
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-label {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ring-time {
+  font-size: clamp(3rem, 16vw, 4rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* 今の手順 */
+.current {
+  text-align: center;
+}
+
+.current-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.current-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.current-target {
+  font-size: clamp(3.2rem, 18vw, 4.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--accent-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.current-target small {
+  font-size: 1.5rem;
+  margin-left: 4px;
+}
+
+.current-pour {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.current-desc {
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+  font-size: 1.05rem;
+}
+
+.current-caution {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.done-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent-strong);
+}
+
+.next {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 1.1rem;
+}
+
+.next strong {
+  overflow-wrap: anywhere;
+}
+
+.next-sec {
+  font-weight: 800;
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 手順の一覧 */
+.step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-row {
+  display: grid;
+  grid-template-columns: 28px 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+}
+
+.step-row:disabled {
+  cursor: default;
+}
+
+.step-row .st-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.step-row .st-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.step-row .st-target {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.step-row.is-past {
+  opacity: 0.6;
+}
+
+.step-row.is-past .st-name {
+  text-decoration: line-through;
+}
+
+.step-row.is-current {
+  border: 2px solid var(--accent);
+  background: var(--surface-2);
+}
+
+.step-row.is-caution .st-name::after {
+  content: ' ⚠';
+  color: var(--danger);
+}
+
+.st-mark {
+  text-align: center;
+  font-weight: 800;
+  color: var(--accent-strong);
+}
+
+/* 下のボタン */
+.controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.controls .btn {
+  min-height: 60px;
+  font-size: 1.25rem;
+}
+
+.toggles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.compact-info {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-weight: 600;
+}

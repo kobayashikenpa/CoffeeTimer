@@ -1,0 +1,88 @@
+/* レシピの追加画面 */
+
+.add-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.choice[aria-pressed='true'] {
+  border: 2px solid var(--accent);
+  background: var(--surface-2);
+}
+
+.choice[aria-pressed='true'] .choice-title::before {
+  content: '✓ ';
+  color: var(--accent-strong);
+}
+
+.choice:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.choice-title {
+  font-weight: 700;
+}
+
+.choice-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+textarea.add-text {
+  min-height: 180px;
+}
+
+.overlay-center {
+  align-items: center;
+}
+
+.reading {
+  align-items: center;
+  text-align: center;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid var(--surface-2);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 3s;
+  }
+}

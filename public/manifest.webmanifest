@@ -1,0 +1,17 @@
+{
+  "name": "CoffeeTimer",
+  "short_name": "CoffeeTimer",
+  "description": "コーヒーのレシピ動画を、手順どおりに進む抽出タイマーにする",
+  "lang": "ja",
+  "start_url": "/CoffeeTimer/",
+  "scope": "/CoffeeTimer/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1c130d",
+  "background_color": "#1c130d",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

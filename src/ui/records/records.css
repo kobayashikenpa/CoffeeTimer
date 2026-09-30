@@ -1,0 +1,106 @@
+/* 淹れた記録（記録をつける画面・記録タブ） */
+
+.record-recipe {
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.record-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.record-amounts dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.record-amounts dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 1.9rem;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  color: var(--muted);
+}
+
+.star-on {
+  color: var(--accent-strong);
+}
+
+textarea.record-memo {
+  min-height: 110px;
+}
+
+.record-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.record-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.record-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.record-date {
+  font-weight: 700;
+}
+
+.record-stars {
+  color: var(--accent-strong);
+  letter-spacing: 1px;
+}
+
+.record-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.record-bean {
+  overflow-wrap: anywhere;
+}
+
+.record-memo-preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+  font-size: 0.9rem;
+}

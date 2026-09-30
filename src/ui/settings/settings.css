@@ -1,0 +1,52 @@
+/* 設定画面 */
+
+.key-state {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.key-result {
+  margin: 0;
+  font-weight: 600;
+}
+
+.key-ok {
+  color: var(--ok);
+}
+
+.key-ng {
+  color: var(--danger);
+}
+
+.howto-box summary {
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--accent-strong);
+}
+
+.howto-link {
+  margin-top: 8px;
+}
+
+.key-notes {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.plan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.plan-table th,
+.plan-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+.plan-table th[scope='row'] {
+  text-align: left;
+}

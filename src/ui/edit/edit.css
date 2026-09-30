@@ -1,0 +1,48 @@
+.edit-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ratio {
+  margin: 0;
+}
+
+.ratio strong {
+  font-size: 1.2rem;
+  margin-left: 8px;
+  color: var(--accent-strong);
+}
+
+/* 開始の時刻を入れて欄を離れると手順が並べ替わる。そのときブラウザが手順のカードを基準に
+   画面を動かす（スクロールの固定）と、ページが大きく跳んで次のタップが外れるため、基準にさせない */
+.step-forms {
+  overflow-anchor: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.step-no {
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.issue-list {
+  margin: 6px 0 0;
+  padding-left: 1.2em;
+}
+
+.save-area {
+  margin-top: 8px;
+}
