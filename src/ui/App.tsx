@@ -3,13 +3,27 @@
 import { useState } from 'react'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
+import { recipeToDraft } from '../engine/validate'
+import type { RecipeDraft } from '../engine/types'
+import { EditRecipe } from './edit/EditRecipe'
+import { emptyDraft } from './edit/form'
 import { useRecipes } from './hooks'
 import { RecipeList } from './recipes/RecipeList'
 import { TabBar } from './tabs/TabBar'
 import type { Tab } from './tabs/TabBar'
 
+/** 「レシピ」タブの中の画面 */
+type RecipeScreen =
+  | { kind: 'list' }
+  | { kind: 'edit'; draft: RecipeDraft; fromAi: boolean; back: RecipeScreen }
+
 export default function App() {
   const [tab, setTab] = useState<Tab>('recipes')
+  const [screen, setScreenState] = useState<RecipeScreen>({ kind: 'list' })
+  const setScreen = (next: RecipeScreen) => {
+    setScreenState(next)
+    window.scrollTo(0, 0)
+  }
   const [brokenNotice, setBrokenNotice] = useState(
     () => recipeStore().recoveredFromBroken || settingsStore().recoveredFromBroken,
   )
@@ -46,12 +60,18 @@ export default function App() {
             </button>
           </div>
         )}
-        {tab === 'recipes' && (
+        {tab === 'recipes' && screen.kind === 'edit' && (
+          <EditRecipe initial={screen.draft} fromAi={screen.fromAi} onCancel={() => setScreen(screen.back)} />
+        )}
+        {tab === 'recipes' && screen.kind === 'list' && (
           <RecipeList
             recipes={recipes}
-            onAdd={() => {}}
+            onAdd={() => setScreen({ kind: 'edit', draft: emptyDraft(), fromAi: false, back: screen })}
             onOpen={() => {}}
-            onEdit={() => {}}
+            onEdit={(id) => {
+              const r = recipeStore().get(id)
+              if (r) setScreen({ kind: 'edit', draft: recipeToDraft(r), fromAi: false, back: screen })
+            }}
             onToggleFavorite={(id) => persisted(recipeStore().toggleFavorite(id))}
             onDelete={(id) => persisted(recipeStore().remove(id))}
           />
