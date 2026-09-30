@@ -6,6 +6,9 @@ import { settingsStore } from '../store/settings'
 import { recipeToDraft, toRecipe } from '../engine/validate'
 import { newId } from '../store/ids'
 import type { RecipeDraft } from '../engine/types'
+import { AddRecipe } from './add/AddRecipe'
+import { emptyAddForm } from './add/addForm'
+import type { AddForm } from './add/addForm'
 import { EditRecipe } from './edit/EditRecipe'
 import { emptyDraft } from './edit/form'
 import { useRecipes } from './hooks'
@@ -18,6 +21,7 @@ import type { Tab } from './tabs/TabBar'
 /** 「レシピ」タブの中の画面 */
 type RecipeScreen =
   | { kind: 'list' }
+  | { kind: 'add'; form: AddForm }
   | { kind: 'edit'; draft: RecipeDraft; fromAi: boolean; back: RecipeScreen }
   | { kind: 'timer'; recipeId: string }
 
@@ -92,6 +96,19 @@ export default function App() {
             onCancel={() => setScreen(screen.back)}
           />
         )}
+        {tab === 'recipes' && screen.kind === 'add' && (
+          <AddRecipe
+            form={screen.form}
+            onFormChange={(form) => setScreenState({ kind: 'add', form })}
+            onRead={(draft) => setScreen({ kind: 'edit', draft, fromAi: true, back: screen })}
+            onManual={() => setScreen({ kind: 'edit', draft: emptyDraft(), fromAi: false, back: screen })}
+            onBack={() => setScreen({ kind: 'list' })}
+            onOpenSettings={() => {
+              setTab('settings')
+              window.scrollTo(0, 0)
+            }}
+          />
+        )}
         {tab === 'recipes' && timerRecipe && (
           <TimerScreen
             key={timerRecipe.id + timerRecipe.updatedAt}
@@ -103,7 +120,7 @@ export default function App() {
         {tab === 'recipes' && (screen.kind === 'list' || (screen.kind === 'timer' && !timerRecipe)) && (
           <RecipeList
             recipes={recipes}
-            onAdd={() => setScreen({ kind: 'edit', draft: emptyDraft(), fromAi: false, back: screen })}
+            onAdd={() => setScreen({ kind: 'add', form: emptyAddForm() })}
             onOpen={(id) => setScreen({ kind: 'timer', recipeId: id })}
             onEdit={(id) => {
               const r = recipeStore().get(id)

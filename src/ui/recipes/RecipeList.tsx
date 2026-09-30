@@ -35,7 +35,7 @@ export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, o
           <p>まだレシピがありません。</p>
           <p className="muted">
             上の「＋
-            レシピを追加」を押して、最初のレシピを作りましょう。豆の量・湯量と、蒸らし・1投目などの手順を入れると、タイマーで淹れられます。
+            レシピを追加」を押して、最初のレシピを作りましょう。YouTube の動画の URL から AI で読み取るか、豆の量・湯量と手順を手で入れると、タイマーで淹れられます。
           </p>
           <button type="button" className="btn btn-primary btn-block" onClick={onAdd}>
             ＋ レシピを追加
