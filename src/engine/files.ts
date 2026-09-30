@@ -2,6 +2,7 @@
 // 読み込むファイルは信用しない。形を確かめ、違えば何も変えずにエラーにする
 import { parseStoredSettings, toStoredRecipe, toStoredRecord } from './stored'
 import type { BrewRecord, Recipe, RecipeDraft, Settings } from './types'
+import { recipeToDraft, validateRecipe } from './validate'
 
 export const FILE_APP = 'CoffeeTimer'
 export const FILE_VERSION = 1
@@ -177,9 +178,17 @@ function parseItems<T extends { id: string }>(v: unknown, parse: (x: unknown) =>
   return items
 }
 
+/** 保存したレシピとして正しいか（形に加えて、仕様 5.3 の保存できない条件に当たらないか） */
+function toValidRecipe(v: unknown): Recipe | null {
+  const r = toStoredRecipe(v)
+  if (!r || validateRecipe(recipeToDraft(r)).errors.length > 0) return null
+  return r
+}
+
 /**
  * バックアップのファイルの文字を読む。
- * 形が違う・壊れている（中の1件だけ違う場合も）ときは、全体をエラーにする（何も変えないため）
+ * 形が違う・壊れている（中の1件だけ違う場合も）・保存できないレシピ（仕様 5.3）があるときは、
+ * 全体をエラーにする（何も変えないため）
  */
 export function parseBackupFile(text: string): FileParseResult<{ backup: BackupFile }> {
   const v = parseJsonText(text)
@@ -187,7 +196,7 @@ export function parseBackupFile(text: string): FileParseResult<{ backup: BackupF
   if (v.kind === 'recipe') return { ok: false, message: FILE_MESSAGES.recipeGiven }
   if (v.kind !== 'backup') return { ok: false, message: FILE_MESSAGES.notBackup }
   if (v.version !== FILE_VERSION) return { ok: false, message: FILE_MESSAGES.newerVersion }
-  const recipes = parseItems(v.recipes, toStoredRecipe)
+  const recipes = parseItems(v.recipes, toValidRecipe)
   const records = parseItems(v.records, toStoredRecord)
   const settings = parseStoredSettings(v.settings)
   if (!recipes || !records || !settings || typeof v.exportedAt !== 'string') {

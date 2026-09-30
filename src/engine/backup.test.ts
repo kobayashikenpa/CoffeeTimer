@@ -99,6 +99,50 @@ describe('toBackupFile・parseBackupFile（仕様 10.2）', () => {
       expect(parseBackupFile(JSON.stringify(bad))).toEqual({ ok: false, message: FILE_MESSAGES.brokenBackup })
     }
   })
+
+  it('形は合っていても、保存できないレシピ（仕様 5.3 のエラー）が1件でもあれば、全体をエラーにする', () => {
+    const step = (startSec: number, targetG: number | null = null) => ({
+      startSec,
+      name: '注ぐ',
+      description: '',
+      targetG,
+      caution: false,
+      cautionText: '',
+    })
+    const bads: Partial<Recipe>[] = [
+      // 手順が開始の時刻の順に並んでいない
+      { steps: [step(0), step(60), step(30)] },
+      // 最初の手順の開始が 0 でない
+      { steps: [step(10), step(60)] },
+      // 完成時刻が最後の手順の開始以前
+      { totalSec: 60, steps: [step(0), step(60)] },
+      { totalSec: 30, steps: [step(0), step(60)] },
+      // 湯量・目標量が整数でない
+      { waterG: 250.5 },
+      { steps: [step(0, 120.5)] },
+      // 目標量が 0 以下
+      { steps: [step(0, 0)] },
+      { steps: [step(0, -10)] },
+      // レシピ名・手順名が空
+      { name: '  ' },
+      { steps: [{ ...step(0), name: '' }] },
+    ]
+    for (const over of bads) {
+      const file = toBackupFile([recipe('a'), recipe('b', over)], [record('x')], settings, NOW)
+      expect(parseBackupFile(JSON.stringify(file))).toEqual({ ok: false, message: FILE_MESSAGES.brokenBackup })
+    }
+  })
+
+  it('注意（目標量が湯量と違う など）だけのレシピは読み込める', () => {
+    const r = recipe('a', {
+      steps: [
+        { startSec: 0, name: '蒸らし', description: '', targetG: 60, caution: false, cautionText: '' },
+        { startSec: 30, name: '2投目', description: '', targetG: 40, caution: false, cautionText: '' },
+      ],
+    })
+    const result = parseBackupFile(JSON.stringify(toBackupFile([r], [], settings, NOW)))
+    expect(result.ok).toBe(true)
+  })
 })
 
 describe('planMerge・applyMerge（今のデータに足す）', () => {
