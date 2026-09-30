@@ -342,7 +342,12 @@ export function TimerScreen({ recipe, onBack, onEdit, onSaveRecord }: TimerScree
                 {shown.targetG}g<small>まで</small>
               </div>
             )}
-            {shownPour !== null && <div className="current-pour">+{shownPour}g</div>}
+            {shownPour !== null && (
+              <div className="current-pour">
+                {shownPour >= 0 ? '+' : ''}
+                {shownPour}g
+              </div>
+            )}
             {shown.description && <p className="current-desc">{shown.description}</p>}
             {shown.caution && <p className="current-caution">⚠ {shown.cautionText || '注意の手順です'}</p>}
           </>
