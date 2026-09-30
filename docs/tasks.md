@@ -279,7 +279,7 @@
 
 ## 3. AI 読み取り
 
-### [ ] E-07 YouTube の URL の確かめ
+### [x] E-07 YouTube の URL の確かめ
 - 担当：engine-dev
 - 依存：E-01
 - 仕様書：6.1
