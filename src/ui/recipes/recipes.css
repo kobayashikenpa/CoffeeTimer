@@ -47,6 +47,12 @@
   overflow-wrap: anywhere;
 }
 
+/* 器具など、カードの中の文字（長い英数字で枠からはみ出さないように） */
+.recipe-open > span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .recipe-meta {
   font-size: 0.95rem;
 }

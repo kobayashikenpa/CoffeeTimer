@@ -75,6 +75,8 @@ body {
 
 body {
   min-height: 100dvh;
+  /* レシピ名・説明・URL など、利用者や AI が入れた長い文字（区切りの無い英数字）も枠の中で折り返す */
+  overflow-wrap: break-word;
 }
 
 button,
@@ -427,6 +429,7 @@ textarea.input {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow-wrap: anywhere;
 }
 
 .dialog-title {
