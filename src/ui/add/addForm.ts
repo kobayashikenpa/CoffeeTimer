@@ -2,7 +2,7 @@
 import { openableUrl } from '../../engine/url'
 import { parseYouTubeUrl } from '../../engine/youtube'
 
-export type AddMode = 'url' | 'text'
+export type AddMode = 'url' | 'text' | 'file'
 
 /** 追加画面の入力。画面を行き来しても消えないよう App が持つ */
 export interface AddForm {

@@ -12,10 +12,12 @@ export interface RecipeListProps {
   onOpen: (id: string) => void
   onEdit: (id: string) => void
   onToggleFavorite: (id: string) => void
+  /** 「人に渡す」：ファイルにして共有機能で送る */
+  onShare: (id: string) => void
   onDelete: (id: string) => void
 }
 
-export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, onDelete }: RecipeListProps) {
+export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, onShare, onDelete }: RecipeListProps) {
   const [menuFor, setMenuFor] = useState<Recipe | null>(null)
   const [deleting, setDeleting] = useState<Recipe | null>(null)
 
@@ -35,7 +37,7 @@ export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, o
           <p>まだレシピがありません。</p>
           <p className="muted">
             上の「＋
-            レシピを追加」を押して、最初のレシピを作りましょう。YouTube の動画の URL から AI で読み取るか、豆の量・湯量と手順を手で入れると、タイマーで淹れられます。
+            レシピを追加」を押して、最初のレシピを作りましょう。YouTube の動画の URL から AI で読み取るか、人から渡されたファイルを読み込むか、豆の量・湯量と手順を手で入れると、タイマーで淹れられます。
           </p>
           <button type="button" className="btn btn-primary btn-block" onClick={onAdd}>
             ＋ レシピを追加
@@ -101,6 +103,17 @@ export function RecipeList({ recipes, onAdd, onOpen, onEdit, onToggleFavorite, o
                 }}
               >
                 編集
+              </button>
+              <button
+                type="button"
+                className="btn btn-block"
+                onClick={() => {
+                  setMenuFor(null)
+                  // iPhone で共有の画面が開くよう、押した操作の中ですぐ呼ぶ
+                  onShare(menuFor.id)
+                }}
+              >
+                人に渡す
               </button>
               <button
                 type="button"

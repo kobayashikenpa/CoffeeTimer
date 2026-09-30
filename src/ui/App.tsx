@@ -7,6 +7,9 @@ import { recipeToDraft, toRecipe } from '../engine/validate'
 import { recordToDraft, toRecord } from '../engine/record'
 import { recordStore } from '../store/records'
 import { newId } from '../store/ids'
+import { shareFile } from '../store/transfer'
+import { sharedRecipeFileName, toSharedRecipeFile } from '../engine/files'
+import { shareMessage } from './shareMessage'
 import type { RecipeDraft } from '../engine/types'
 import { AddRecipe } from './add/AddRecipe'
 import { emptyAddForm } from './add/addForm'
@@ -26,7 +29,7 @@ import type { Tab } from './tabs/TabBar'
 type RecipeScreen =
   | { kind: 'list' }
   | { kind: 'add'; form: AddForm }
-  | { kind: 'edit'; draft: RecipeDraft; fromAi: boolean; back: RecipeScreen }
+  | { kind: 'edit'; draft: RecipeDraft; fromAi: boolean; fromFile?: boolean; back: RecipeScreen }
   | { kind: 'timer'; recipeId: string }
 
 export default function App() {
@@ -34,6 +37,7 @@ export default function App() {
   const [screen, setScreenState] = useState<RecipeScreen>({ kind: 'list' })
   const setScreen = (next: RecipeScreen) => {
     setScreenState(next)
+    setRecipeNotice(null)
     window.scrollTo(0, 0)
   }
   const [brokenNotice, setBrokenNotice] = useState(
@@ -41,6 +45,8 @@ export default function App() {
       recipeStore().recoveredFromBroken || recordStore().recoveredFromBroken || settingsStore().recoveredFromBroken,
   )
   const [saveFailed, setSaveFailed] = useState(false)
+  // レシピ一覧の上に出す短い知らせ（人に渡した結果など）
+  const [recipeNotice, setRecipeNotice] = useState<string | null>(null)
   const recipes = useRecipes()
   const records = useRecords()
   // 記録タブ：直している記録の ID（null は一覧）・絞り込み・知らせ
@@ -99,6 +105,7 @@ export default function App() {
           <EditRecipe
             initial={screen.draft}
             fromAi={screen.fromAi}
+            fromFile={screen.fromFile}
             onSave={(draft) => {
               const existing = draft.id === null ? undefined : recipeStore().get(draft.id)
               const recipe = toRecipe(draft, {
@@ -117,6 +124,7 @@ export default function App() {
             form={screen.form}
             onFormChange={(form) => setScreenState({ kind: 'add', form })}
             onRead={(draft) => setScreen({ kind: 'edit', draft, fromAi: true, back: screen })}
+            onReceive={(draft) => setScreen({ kind: 'edit', draft, fromAi: false, fromFile: true, back: screen })}
             onManual={() => setScreen({ kind: 'edit', draft: emptyDraft(), fromAi: false, back: screen })}
             onBack={() => setScreen({ kind: 'list' })}
             onOpenSettings={() => {
@@ -142,6 +150,14 @@ export default function App() {
             }}
           />
         )}
+        {tab === 'recipes' && (screen.kind === 'list' || (screen.kind === 'timer' && !timerRecipe)) && recipeNotice && (
+          <div className="notice notice-row" role="status" style={{ marginBottom: 16 }}>
+            <p>{recipeNotice}</p>
+            <button type="button" className="btn btn-ghost" aria-label="この知らせを閉じる" onClick={() => setRecipeNotice(null)}>
+              ✕
+            </button>
+          </div>
+        )}
         {tab === 'recipes' && (screen.kind === 'list' || (screen.kind === 'timer' && !timerRecipe)) && (
           <RecipeList
             recipes={recipes}
@@ -152,6 +168,14 @@ export default function App() {
               if (r) setScreen({ kind: 'edit', draft: recipeToDraft(r), fromAi: false, back: screen })
             }}
             onToggleFavorite={(id) => persisted(recipeStore().toggleFavorite(id))}
+            onShare={(id) => {
+              const r = recipeStore().get(id)
+              if (!r) return
+              setRecipeNotice(null)
+              void shareFile(sharedRecipeFileName(r), JSON.stringify(toSharedRecipeFile(r), null, 2)).then((result) => {
+                setRecipeNotice(shareMessage(result, `「${r.name}」`))
+              })
+            }}
             onDelete={(id) => persisted(recipeStore().remove(id))}
           />
         )}

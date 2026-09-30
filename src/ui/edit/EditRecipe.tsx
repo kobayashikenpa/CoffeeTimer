@@ -18,6 +18,8 @@ export interface EditRecipeProps {
   initial: RecipeDraft
   /** AI で読み取った直後なら true（注意の文を出す） */
   fromAi?: boolean
+  /** 人から受け取ったファイルを読んだ直後なら true（確かめてから保存する案内を出す） */
+  fromFile?: boolean
   /** 保存を押し、確かめを通ったとき（エラーが無い下書き。手順は開始の時刻の順） */
   onSave: (draft: RecipeDraft) => void
   onCancel: () => void
@@ -28,7 +30,7 @@ function snapshot(form: RecipeForm): string {
   return JSON.stringify({ ...form, steps: form.steps.map(({ key: _key, ...rest }) => rest) })
 }
 
-export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRecipeProps) {
+export function EditRecipe({ initial, fromAi = false, fromFile = false, onSave, onCancel }: EditRecipeProps) {
   const [form, setForm] = useState<RecipeForm>(() => draftToForm(initial))
   const [initialSnapshot] = useState(() => snapshot(form))
   // AI で読み取った直後は、空の必須項目などをはじめからその項目のそばに出す（仕様 6.3・7）
@@ -113,6 +115,12 @@ export function EditRecipe({ initial, fromAi = false, onSave, onCancel }: EditRe
       {fromAi && (
         <div className="notice notice-warn" role="note">
           <p>AI の読み取りは間違えることがあります。動画と見比べて確かめてください</p>
+        </div>
+      )}
+
+      {fromFile && (
+        <div className="notice" role="note">
+          <p>人から受け取ったレシピです。中身を確かめてから「保存」を押すと、新しいレシピとして一覧に入ります</p>
         </div>
       )}
 

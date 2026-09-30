@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import { readRecipe } from '../../ai/gemini'
 import type { ReadErrorKind } from '../../ai/gemini'
 import type { ReadInput } from '../../ai/prompt'
+import { parseSharedRecipeFile } from '../../engine/files'
 import { formatTime } from '../../engine/time'
 import type { RecipeDraft } from '../../engine/types'
 import { parseYouTubeUrl } from '../../engine/youtube'
 import { apiKeyStore } from '../../store/apiKey'
+import { readFile } from '../../store/transfer'
 import { resolveTextVideoUrl } from './addForm'
 import type { AddForm, AddMode } from './addForm'
 import { READ_ERROR_MESSAGES, READING_MESSAGE } from './messages'
@@ -18,6 +20,8 @@ export interface AddRecipeProps {
   onFormChange: (form: AddForm) => void
   /** 読み取れたとき（確認・編集画面へ） */
   onRead: (draft: RecipeDraft) => void
+  /** 人から受け取ったファイルを読めたとき（確認・編集画面へ） */
+  onReceive: (draft: RecipeDraft) => void
   /** 「手で入れる」 */
   onManual: () => void
   onBack: () => void
@@ -31,12 +35,20 @@ const TEXT_URL_FORMAT_ERROR = 'URL の形が違います。https:// で始まる
 
 type ShownError = Exclude<ReadErrorKind, 'cancelled'>
 
-export function AddRecipe({ form, onFormChange, onRead, onManual, onBack, onOpenSettings }: AddRecipeProps) {
+/** 読み込めなかったファイルの文（大きすぎる・読めない） */
+const FILE_READ_ERRORS = {
+  tooLarge: 'ファイルが大きすぎるため、読み込めませんでした。CoffeeTimer のレシピのファイルか確かめてください',
+  unreadable: 'ファイルを開けませんでした。もう一度選んでください',
+} as const
+
+export function AddRecipe({ form, onFormChange, onRead, onReceive, onManual, onBack, onOpenSettings }: AddRecipeProps) {
   const [urlError, setUrlError] = useState<string | null>(null)
   const [textError, setTextError] = useState<string | null>(null)
   const [textUrlError, setTextUrlError] = useState<string | null>(null)
   const [readError, setReadError] = useState<ShownError | null>(null)
-  const [reading, setReading] = useState<{ mode: AddMode; startedAt: number } | null>(null)
+  const [reading, setReading] = useState<{ mode: Exclude<AddMode, 'file'>; startedAt: number } | null>(null)
+  const [fileError, setFileError] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const ctrlRef = useRef<AbortController | null>(null)
 
   // 画面を離れたら読み取りをやめる
@@ -46,6 +58,21 @@ export function AddRecipe({ form, onFormChange, onRead, onManual, onBack, onOpen
   const chooseMode = (mode: AddMode) => {
     set({ mode })
     setReadError(null)
+    setFileError(null)
+  }
+
+  /** 選んだファイルを読み、レシピのファイルなら確認・編集画面へ。違えば何もせずにエラーを出す */
+  const receiveFile = async (file: File | undefined) => {
+    if (!file) return
+    setFileError(null)
+    const read = await readFile(file)
+    if (!read.ok) {
+      setFileError(FILE_READ_ERRORS[read.reason])
+      return
+    }
+    const parsed = parseSharedRecipeFile(read.text)
+    if (parsed.ok) onReceive(parsed.draft)
+    else setFileError(parsed.message)
   }
 
   const start = async (input: ReadInput, videoUrl: string | undefined) => {
@@ -143,11 +170,14 @@ export function AddRecipe({ form, onFormChange, onRead, onManual, onBack, onOpen
           <span className="choice-title">文章を貼り付ける</span>
           <span className="choice-note">説明欄やブログの文章から AI が読み取ります</span>
         </button>
-        <button type="button" className="choice" disabled aria-describedby="file-soon">
+        <button
+          type="button"
+          className="choice"
+          aria-pressed={form.mode === 'file'}
+          onClick={() => chooseMode('file')}
+        >
           <span className="choice-title">ファイルから受け取る</span>
-          <span className="choice-note" id="file-soon">
-            今後の版で使えるようになります
-          </span>
+          <span className="choice-note">人から渡されたレシピのファイルを読み込みます</span>
         </button>
         <button type="button" className="choice" onClick={onManual}>
           <span className="choice-title">手で入れる</span>
@@ -272,6 +302,40 @@ export function AddRecipe({ form, onFormChange, onRead, onManual, onBack, onOpen
             AI で読み取る
           </button>
         </form>
+      )}
+
+      {form.mode === 'file' && (
+        <div className="card stack">
+          <p style={{ margin: 0 }}>
+            人から渡されたレシピのファイル（名前が「coffeetimer-recipe-」で始まる .json のファイル）を選びます。読み込んだ後、中身を確かめてから保存します。
+          </p>
+          <p className="muted small" style={{ margin: 0 }}>
+            LINE やメールで受け取ったファイルは、先にスマホに保存してから選んでください。
+          </p>
+          <input
+            ref={fileRef}
+            id="f-add-file"
+            type="file"
+            accept=".json,application/json"
+            className="visually-hidden"
+            tabIndex={-1}
+            aria-hidden="true"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              // 同じファイルをもう一度選べるように空にしておく
+              e.target.value = ''
+              void receiveFile(file)
+            }}
+          />
+          {fileError && (
+            <div className="notice notice-danger" role="alert">
+              <p style={{ fontWeight: 700 }}>{fileError}</p>
+            </div>
+          )}
+          <button type="button" className="btn btn-primary btn-block btn-lg" onClick={() => fileRef.current?.click()}>
+            ファイルを選ぶ
+          </button>
+        </div>
       )}
 
       {reading && (
