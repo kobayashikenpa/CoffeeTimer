@@ -325,7 +325,7 @@
   - 200 と正しい返答で下書きが返るテストが通る
   - fetch が失敗 → network、400（API_KEY_INVALID）・403 → invalidKey、429 → quota、キー以外の 400 → video、返答が JSON でない → broken、中止 → cancelled のテストが通る
 
-### [ ] A-03 APIキーの確かめ
+### [x] A-03 APIキーの確かめ
 - 担当：engine-dev
 - 依存：A-02
 - 仕様書：6.4、11

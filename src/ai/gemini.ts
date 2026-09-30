@@ -169,3 +169,33 @@ export async function readRecipe(opts: ReadRecipeOptions): Promise<ReadResult> {
     signal?.removeEventListener('abort', onAbort)
   }
 }
+
+/**
+ * キーを確かめた結果（仕様 6.4・11）。
+ * ok：使える / invalidKey：正しくない / quota：上限 / network：通信できない / unknown：そのほか（暫定）
+ */
+export type KeyCheckResult = 'ok' | 'invalidKey' | 'quota' | 'network' | 'unknown'
+
+/**
+ * キーが使えるかを試す。回数の少ない、モデルの情報を取る GET をヘッダーつきで呼ぶ（暫定）。
+ * 200 なら使える。例外は投げない
+ */
+export async function checkApiKey(opts: { apiKey: string; fetch?: FetchLike; signal?: AbortSignal }): Promise<KeyCheckResult> {
+  const apiKey = opts.apiKey.trim()
+  if (apiKey === '') return 'invalidKey'
+  const fetch = opts.fetch ?? defaultFetch
+  let res: Response
+  try {
+    res = await fetch(`${GEMINI_API_BASE}/models/${GEMINI_MODEL}`, {
+      method: 'GET',
+      headers: headers(apiKey, false),
+      signal: opts.signal,
+    })
+  } catch {
+    return 'network'
+  }
+  if (res.ok) return 'ok'
+  if (res.status === 400 || res.status === 401 || res.status === 403) return 'invalidKey'
+  if (res.status === 429) return 'quota'
+  return 'unknown'
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GEMINI_API_BASE, GEMINI_MODEL } from './model'
-import { readRecipe } from './gemini'
+import { checkApiKey, readRecipe } from './gemini'
 import type { FetchLike } from './gemini'
 
 // テスト用の仮のキー（本物のキーではない）
@@ -239,5 +239,47 @@ describe('readRecipe（Gemini で読み取る）', () => {
   it('時間の上限を過ぎたら打ち切って timeout', async () => {
     const r = await readRecipe({ input: { kind: 'url', url: VIDEO }, apiKey: KEY, fetch: hangingFetch, timeoutMs: 20 })
     expect(r).toEqual({ ok: false, error: 'timeout' })
+  })
+})
+
+describe('checkApiKey（キーを確かめる）', () => {
+  it('モデル情報を取る GET を、キーをヘッダーに入れて呼ぶ（URL にキーを入れない）', async () => {
+    const fetch = fakeFetch(() => jsonResponse(200, { name: `models/${GEMINI_MODEL}` }))
+    expect(await checkApiKey({ apiKey: KEY, fetch })).toBe('ok')
+    const { url, init } = fetch.calls[0]
+    expect(url).toBe(`${GEMINI_API_BASE}/models/${GEMINI_MODEL}`)
+    expect(url).not.toContain(KEY)
+    expect(init.method).toBe('GET')
+    expect(new Headers(init.headers).get('x-goog-api-key')).toBe(KEY)
+  })
+
+  it('400・401・403 → 正しくない', async () => {
+    for (const status of [400, 401, 403]) {
+      const fetch = fakeFetch(() => jsonResponse(status, apiError(status, 'API_KEY_INVALID')))
+      expect(await checkApiKey({ apiKey: KEY, fetch })).toBe('invalidKey')
+    }
+  })
+
+  it('429 → 上限', async () => {
+    const fetch = fakeFetch(() => jsonResponse(429, apiError(429)))
+    expect(await checkApiKey({ apiKey: KEY, fetch })).toBe('quota')
+  })
+
+  it('fetch が失敗 → 通信できない', async () => {
+    const fetch: FetchLike = async () => {
+      throw new TypeError('Failed to fetch')
+    }
+    expect(await checkApiKey({ apiKey: KEY, fetch })).toBe('network')
+  })
+
+  it('そのほか（500 など）→ 確かめられない', async () => {
+    const fetch = fakeFetch(() => jsonResponse(503, apiError(503)))
+    expect(await checkApiKey({ apiKey: KEY, fetch })).toBe('unknown')
+  })
+
+  it('キーが空なら送らずに 正しくない', async () => {
+    const fetch = fakeFetch(() => jsonResponse(200, {}))
+    expect(await checkApiKey({ apiKey: '', fetch })).toBe('invalidKey')
+    expect(fetch.calls).toHaveLength(0)
   })
 })
