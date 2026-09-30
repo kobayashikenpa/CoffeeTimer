@@ -1,8 +1,9 @@
-// 設定画面（仕様 6.4・10.3・11）。バックアップの欄は後の作業で足す
+// 設定画面（仕様 6.4・10・11）
 import { settingsStore } from '../../store/settings'
 import { Switch } from '../common/Switch'
 import { useSettings } from '../hooks'
 import { ApiKeySection } from './ApiKeySection'
+import { BackupSection } from './BackupSection'
 import './settings.css'
 
 export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) => void }) {
@@ -39,6 +40,8 @@ export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) =
         </p>
       </section>
 
+      <BackupSection />
+
       <section className="card stack" aria-labelledby="home-title">
         <h2 id="home-title" className="section-title">
           ホーム画面に追加する
@@ -69,7 +72,7 @@ export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) =
           データの保存について
         </h2>
         <p style={{ margin: 0 }}>
-          レシピと設定は、この端末のブラウザの中にだけ保存されます。ほかの端末とは共有されません。
+          レシピ・淹れた記録・設定は、この端末のブラウザの中にだけ保存されます。ほかの端末とは共有されません。
         </p>
         <div className="notice notice-warn">
           <p>
@@ -77,6 +80,7 @@ export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) =
             は、7日間このページを開かないと、保存したデータを消すことがあります。「ホーム画面に追加」して使うと消えにくくなります。
           </p>
         </div>
+        <p style={{ margin: 0 }}>念のため、ときどき上の「バックアップを書き出す」でファイルを保存しておいてください。</p>
       </section>
     </div>
   )

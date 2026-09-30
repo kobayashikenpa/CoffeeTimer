@@ -30,3 +30,19 @@
   margin: 0;
   padding-left: 1.2em;
 }
+
+.plan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.plan-table th,
+.plan-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+.plan-table th[scope='row'] {
+  text-align: left;
+}

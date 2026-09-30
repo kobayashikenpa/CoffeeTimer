@@ -1,5 +1,6 @@
 // 確認のダイアログ（削除・やめる など）
 import { useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 
 export interface ConfirmDialogProps {
   title: string
@@ -7,6 +8,8 @@ export interface ConfirmDialogProps {
   confirmLabel: string
   cancelLabel?: string
   danger?: boolean
+  /** 文だけで足りないときの中身（件数の表など） */
+  children?: ReactNode
   onConfirm: () => void
   onCancel: () => void
 }
@@ -17,6 +20,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel = 'キャンセル',
   danger,
+  children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -47,6 +51,7 @@ export function ConfirmDialog({
           {title}
         </p>
         {message && <p style={{ margin: 0 }}>{message}</p>}
+        {children}
         <div className="dialog-actions">
           <button
             type="button"

@@ -73,8 +73,8 @@ export function RecordsScreen({
               <option value="">すべてのレシピ（{records.length}件）</option>
               {options.map((o) => (
                 <option key={o.recipeId} value={o.recipeId}>
-                  {o.name}
-                  {o.deleted ? '（削除したレシピ）' : ''}（{o.count}件）
+                  {o.name}（{o.deleted ? '削除したレシピ・' : ''}
+                  {o.count}件）
                 </option>
               ))}
             </select>
