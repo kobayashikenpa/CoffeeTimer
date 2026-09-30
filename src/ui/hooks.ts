@@ -1,6 +1,7 @@
 // store と画面をつなぐ（useSyncExternalStore）
 import { useSyncExternalStore } from 'react'
-import type { Recipe, Settings } from '../engine/types'
+import type { BrewRecord, Recipe, Settings } from '../engine/types'
+import { recordStore } from '../store/records'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
 import { apiKeyStore } from '../store/apiKey'
@@ -27,4 +28,10 @@ export function useSettings(): Settings {
 export function useHasApiKey(): boolean {
   const store = apiKeyStore()
   return useSyncExternalStore(store.subscribe, store.has)
+}
+
+/** 淹れた記録の一覧（新しい順） */
+export function useRecords(): readonly BrewRecord[] {
+  const store = recordStore()
+  return useSyncExternalStore(store.subscribe, store.list)
 }

@@ -1,6 +1,8 @@
 // タイマー画面（仕様 8）
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { detectCue } from '../../engine/cue'
+import { createRecordDraft } from '../../engine/record'
+import type { RecordDraft } from '../../engine/record'
 import type { Cue, CueMark } from '../../engine/cue'
 import { parseDecimal } from '../../engine/number'
 import { pourAmounts, ratio } from '../../engine/recipe'
@@ -15,6 +17,7 @@ import { prepareSound, playSound } from '../device/sound'
 import { prepareSpeech, speak, stopSpeech } from '../device/speech'
 import { useWakeLock } from '../device/wakeLock'
 import { useSettings } from '../hooks'
+import { RecordEditor } from '../records/RecordEditor'
 import { Ring } from './Ring'
 import './timer.css'
 
@@ -22,6 +25,8 @@ export interface TimerScreenProps {
   recipe: Recipe
   onBack: () => void
   onEdit: () => void
+  /** 「記録をつける」で入れた記録を保存する */
+  onSaveRecord: (draft: RecordDraft) => void
 }
 
 /** 今の時刻（ミリ秒） */
@@ -34,12 +39,14 @@ const PHASE_LABEL: Record<TimerState['phase'], string> = {
   done: '完成',
 }
 
-export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
+export function TimerScreen({ recipe, onBack, onEdit, onSaveRecord }: TimerScreenProps) {
   const [beans, setBeans] = useState(recipe.beansG)
   const [beansText, setBeansText] = useState(String(recipe.beansG))
   const [state, setState] = useState<TimerState>(initial)
   const [now, setNow] = useState(nowMs)
   const stateRef = useRef<TimerState>(state)
+  // 「記録をつける」の入力中（タイマーの状態は残したまま、この画面の中で開く）
+  const [recording, setRecording] = useState<RecordDraft | null>(null)
   const lastCueRef = useRef<CueMark>(null)
 
   // 豆の量を変えたときは、湯量・目標量を計算し直したレシピを使う（時間は変わらない）
@@ -153,6 +160,19 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
   const shownPour = shownIndex === null ? null : pours[shownIndex]
   const nextIndex = state.phase === 'ready' ? (shownIndex === null ? null : shownIndex + 1) : v.nextIndex
   const next = nextIndex === null ? undefined : scaled.steps[nextIndex]
+
+  if (recording) {
+    return (
+      <RecordEditor
+        initial={recording}
+        onSave={onSaveRecord}
+        onCancel={() => {
+          setRecording(null)
+          window.scrollTo(0, 0)
+        }}
+      />
+    )
+  }
 
   return (
     <div className="timer">
@@ -298,10 +318,18 @@ export function TimerScreen({ recipe, onBack, onEdit }: TimerScreenProps) {
         {v.done ? (
           <div className="stack" style={{ alignItems: 'center' }}>
             <span className="done-title">抽出完了</span>
-            <button type="button" className="btn btn-primary btn-block btn-lg" disabled>
+            <button
+              type="button"
+              className="btn btn-primary btn-block btn-lg"
+              onClick={() => {
+                // 豆の量を変えて淹れたときは、そのときの豆の量・湯量を入れる
+                setRecording(createRecordDraft(recipe, scaled.beansG, scaled.waterG, new Date().toISOString()))
+                window.scrollTo(0, 0)
+              }}
+            >
               記録をつける
             </button>
-            <span className="small muted">淹れた記録は、今後の版でつけられるようになります。</span>
+            <span className="small muted">豆の名前や味の感想を残せます。</span>
           </div>
         ) : shown ? (
           <>

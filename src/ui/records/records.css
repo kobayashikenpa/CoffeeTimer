@@ -1,0 +1,46 @@
+/* 淹れた記録（記録をつける画面・記録タブ） */
+
+.record-recipe {
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.record-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.record-amounts dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.record-amounts dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 1.9rem;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  color: var(--muted);
+}
+
+.star-on {
+  color: var(--accent-strong);
+}
+
+textarea.record-memo {
+  min-height: 110px;
+}

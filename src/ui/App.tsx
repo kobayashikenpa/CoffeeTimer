@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
 import { recipeToDraft, toRecipe } from '../engine/validate'
+import { toRecord } from '../engine/record'
+import { recordStore } from '../store/records'
 import { newId } from '../store/ids'
 import type { RecipeDraft } from '../engine/types'
 import { AddRecipe } from './add/AddRecipe'
@@ -11,7 +13,7 @@ import { emptyAddForm } from './add/addForm'
 import type { AddForm } from './add/addForm'
 import { EditRecipe } from './edit/EditRecipe'
 import { emptyDraft } from './edit/form'
-import { useRecipes } from './hooks'
+import { useRecipes, useRecords } from './hooks'
 import { TimerScreen } from './timer/TimerScreen'
 import { RecipeList } from './recipes/RecipeList'
 import { SettingsScreen } from './settings/SettingsScreen'
@@ -33,10 +35,12 @@ export default function App() {
     window.scrollTo(0, 0)
   }
   const [brokenNotice, setBrokenNotice] = useState(
-    () => recipeStore().recoveredFromBroken || settingsStore().recoveredFromBroken,
+    () =>
+      recipeStore().recoveredFromBroken || recordStore().recoveredFromBroken || settingsStore().recoveredFromBroken,
   )
   const [saveFailed, setSaveFailed] = useState(false)
   const recipes = useRecipes()
+  const records = useRecords()
   const timerRecipe = screen.kind === 'timer' ? recipes.find((r) => r.id === screen.recipeId) : undefined
   // タイマー画面の間は下のタブを隠して画面を広く使う
   const hideTabs = tab === 'recipes' && timerRecipe !== undefined
@@ -115,6 +119,14 @@ export default function App() {
             recipe={timerRecipe}
             onBack={() => setScreen({ kind: 'list' })}
             onEdit={() => setScreen({ kind: 'edit', draft: recipeToDraft(timerRecipe), fromAi: false, back: screen })}
+            onSaveRecord={(draft) => {
+              const record = toRecord(draft, { id: newId(), nowIso: new Date().toISOString() })
+              persisted(recordStore().save(record))
+              // 保存したら記録タブで見せる（レシピタブは一覧に戻す）
+              setScreenState({ kind: 'list' })
+              setTab('records')
+              window.scrollTo(0, 0)
+            }}
           />
         )}
         {tab === 'recipes' && (screen.kind === 'list' || (screen.kind === 'timer' && !timerRecipe)) && (
@@ -133,7 +145,7 @@ export default function App() {
         {tab === 'records' && (
           <>
             <h1 className="page-title">記録</h1>
-            <p className="muted">淹れた記録の機能は、今後の版で使えるようになります。</p>
+            <p className="muted">淹れた記録：{records.length} 件</p>
           </>
         )}
         {tab === 'settings' && <SettingsScreen onSaveResult={persisted} />}
