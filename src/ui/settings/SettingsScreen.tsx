@@ -1,7 +1,9 @@
-// 設定画面（仕様 10.3・11）。APIキー・バックアップの欄は後の作業で足す
+// 設定画面（仕様 6.4・10.3・11）。バックアップの欄は後の作業で足す
 import { settingsStore } from '../../store/settings'
 import { Switch } from '../common/Switch'
 import { useSettings } from '../hooks'
+import { ApiKeySection } from './ApiKeySection'
+import './settings.css'
 
 export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) => void }) {
   const settings = useSettings()
@@ -10,6 +12,8 @@ export function SettingsScreen({ onSaveResult }: { onSaveResult: (ok: boolean) =
       <h1 className="page-title" style={{ margin: 0 }}>
         設定
       </h1>
+
+      <ApiKeySection onSaveResult={onSaveResult} />
 
       <section className="card stack" aria-labelledby="sound-title">
         <h2 id="sound-title" className="section-title">

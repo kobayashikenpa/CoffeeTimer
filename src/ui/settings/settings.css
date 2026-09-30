@@ -1,0 +1,32 @@
+/* 設定画面 */
+
+.key-state {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.key-result {
+  margin: 0;
+  font-weight: 600;
+}
+
+.key-ok {
+  color: var(--ok);
+}
+
+.key-ng {
+  color: var(--danger);
+}
+
+.howto-box summary {
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--accent-strong);
+}
+
+.key-notes {
+  margin: 0;
+  padding-left: 1.2em;
+}

@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react'
 import type { Recipe, Settings } from '../engine/types'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
+import { apiKeyStore } from '../store/apiKey'
 
 /** レシピの一覧（お気に入りが上、その中は新しい順） */
 export function useRecipes(): readonly Recipe[] {
@@ -20,4 +21,10 @@ export function useRecipe(id: string): Recipe | undefined {
 export function useSettings(): Settings {
   const store = settingsStore()
   return useSyncExternalStore(store.subscribe, store.get)
+}
+
+/** APIキーが設定済みか（キーの文字そのものは画面に渡さない） */
+export function useHasApiKey(): boolean {
+  const store = apiKeyStore()
+  return useSyncExternalStore(store.subscribe, store.has)
 }
