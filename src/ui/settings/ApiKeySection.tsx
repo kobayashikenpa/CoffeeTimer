@@ -146,15 +146,20 @@ export function ApiKeySection({ onSaveResult }: { onSaveResult: (ok: boolean) =>
         <summary>APIキーの取り方</summary>
         <ol className="howto">
           <li>
-            <a href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
+            下のボタンで Google AI Studio を開きます（別の画面で開きます）
+            <a className="btn btn-block howto-link" href={AI_STUDIO_URL} target="_blank" rel="noopener noreferrer">
               Google AI Studio（APIキーの画面）↗
             </a>
-            を開きます
           </li>
           <li>Google のアカウントでログインします</li>
-          <li>「APIキーを作成」（Create API key）を押します</li>
+          <li>
+            「APIキーを作成」「Create API key」などの名前のボタンを押します（見つからないときは、「API キー」「Get API key」などと書かれた場所を開いてから探します）
+          </li>
           <li>出てきたキーをコピーし、上の欄に貼り付けて「保存」を押します</li>
         </ol>
+        <p className="muted small" style={{ margin: 0 }}>
+          Google の画面は、ボタンの名前や場所がときどき変わります。同じ言葉が見つからないときは、近い意味のボタンを探してください。
+        </p>
       </details>
       <ul className="muted small key-notes">
         <li>APIキーは、ほかの人に教えないでください</li>
