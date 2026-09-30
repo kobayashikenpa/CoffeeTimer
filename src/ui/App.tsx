@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { recipeStore } from '../store/recipes'
 import { settingsStore } from '../store/settings'
-import { recipeToDraft } from '../engine/validate'
+import { recipeToDraft, toRecipe } from '../engine/validate'
+import { newId } from '../store/ids'
 import type { RecipeDraft } from '../engine/types'
 import { EditRecipe } from './edit/EditRecipe'
 import { emptyDraft } from './edit/form'
@@ -61,7 +62,21 @@ export default function App() {
           </div>
         )}
         {tab === 'recipes' && screen.kind === 'edit' && (
-          <EditRecipe initial={screen.draft} fromAi={screen.fromAi} onCancel={() => setScreen(screen.back)} />
+          <EditRecipe
+            initial={screen.draft}
+            fromAi={screen.fromAi}
+            onSave={(draft) => {
+              const existing = draft.id === null ? undefined : recipeStore().get(draft.id)
+              const recipe = toRecipe(draft, {
+                id: draft.id ?? newId(),
+                nowIso: new Date().toISOString(),
+                createdAt: existing?.createdAt,
+              })
+              persisted(recipeStore().save(recipe))
+              setScreen({ kind: 'list' })
+            }}
+            onCancel={() => setScreen(screen.back)}
+          />
         )}
         {tab === 'recipes' && screen.kind === 'list' && (
           <RecipeList
